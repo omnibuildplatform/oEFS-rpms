@@ -1,0 +1,143 @@
+From 9648228a3f64de46dd7fbb26e2df429352de17e1 Mon Sep 17 00:00:00 2001
+From: yangmingtaip <yangmingtai@huawei.com>
+Date: Sat, 4 Sep 2021 14:14:54 +0800
+Subject: [PATCH] add brp scripts to delete rpath
+
+---
+ brp-chrpath | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ macros      |   2 +
+ 2 files changed, 105 insertions(+)
+ create mode 100755 brp-chrpath
+
+diff --git a/brp-chrpath b/brp-chrpath
+new file mode 100755
+index 0000000..6dd37de
+--- /dev/null
++++ b/brp-chrpath
+@@ -0,0 +1,103 @@
++#!/usr/bin/sh
++# remove rpath specified
++
++rpathSuffix=(
++	"/home/abuild/rpmbuild/BUILD"
++)
++
++rpath=(
++	"/usr/lib64",
++	"/lib64",
++	"/usr/lib",
++	"/lib",
++	"/usr/lib/../lib64"
++)
++
++buildroot=$1
++
++function rpathChange()
++{
++	localSrcPath=$1
++	localDstPath=""
++
++	rpathArr=(`echo $localSrcPath | tr ':' ' '`)
++
++	for path in ${rpathArr[*]}
++	do
++		localflag=0
++		for suffix in ${rpathSuffix[*]}
++		do
++			if echo "$path" | grep $suffix &> /dev/null; then
++				localflag=1
++				break
++			fi
++		done
++
++		# Is the suffix path, delete
++		if [ $localflag -eq 1 ]; then
++			continue;
++		fi
++
++		#Is the standard path, delete
++		if echo "${rpath[@]}" | grep -w $path &> /dev/null; then
++			continue
++		fi
++
++		if [ x"$localDstPath" == x"" ]; then
++			localDstPath=$path
++		else
++			localDstPath=$localDstPath:$path
++		fi
++	done
++
++	echo $localDstPath
++}
++
++function removeRpathOrRunpath()
++{
++	localfile=$1
++
++	rpathInfo=$(chrpath -l $localfile | grep "RPATH=")
++	runpathInfo=$(chrpath -l $localfile | grep "RUNPATH=")
++
++	currPath=""
++	realPath=""
++	needCh=0
++	if [ x"$rpathInfo" != x"" ]; then
++		needCh=1
++		currPath=$(echo $rpathInfo | awk -F "RPATH=" '{print $2}')
++		realPath=$(rpathChange $currPath)
++	fi
++
++	if [ x"$runpathInfo" != x"" ]; then
++		needCh=1
++                currPath=$(echo $runpathInfo | awk -F "RUNPATH=" '{print $2}')
++                realPath=$(rpathChange $currPath)
++	fi
++
++	if [ $needCh -eq 0 ]; then
++		return 0
++	fi
++
++	if [ x"$realPath" == x"" ]; then
++		chrpath -d $localfile
++	else
++		chrpath -r $realPath $localfile
++	fi
++
++	return 0
++}
++
++for file in $(find $buildroot/ -executable -type f -exec file {} ';' | grep "\<ELF\>" | awk -F ':' '{print $1}')
++do
++	test -u $file
++	if [ $? -eq 0 ]; then
++		continue
++	fi
++
++	if [ -w "$file" ]; then
++		removeRpathOrRunpath $file
++	fi
++done
++
++exit 0
+diff --git a/macros b/macros
+index 7cde63f..ee0c126 100644
+--- a/macros
++++ b/macros
+@@ -89,6 +89,7 @@
+ 
+ # Build root policy macros. Standard naming:
+ # convert all '-' in basename to '_', add two leading underscores.
++%__brp_chrpath /usr/lib/rpm/brp-chrpath %{buildroot}
+ %__brp_ldconfig /usr/lib/rpm/brp-ldconfig
+ %__brp_compress /usr/lib/rpm/brp-compress
+ %__brp_strip /usr/lib/rpm/brp-strip %{__strip}
+@@ -107,6 +108,7 @@
+     %{?__brp_strip_static_archive} \
+     %{?py_auto_byte_compile:%{?__brp_python_bytecompile}} \
+     %{?__brp_python_hardlink} \
++    %{?openEuler_delete_rpath:%{?__brp_chrpath}} \
+ %{nil}
+ 
+ %__spec_install_post\
+-- 
+2.23.0
+

@@ -1,0 +1,27 @@
+From c1b9fdaa93bfe0b2c70be4a851500d15f891d2f8 Mon Sep 17 00:00:00 2001
+From: whoisxxx <whoisxxx@126.com>
+Date: Sat, 28 Nov 2020 11:02:21 +0800
+Subject: [PATCH] !1 Add "riscv64" to golang_arches The golang version 1.14 has
+ support riscv64, so add "riscv64" to golang_arches to enable rpmbuild for
+ golang.
+
+---
+ macros.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/macros.go b/macros.go
+index c1e6e75..cd493e7 100644
+--- a/macros.go
++++ b/macros.go
+@@ -12,7 +12,7 @@
+ # redhat-rpm-macros.
+ 
+ # Define arches for PA and SA
+-%golang_arches   %{ix86} x86_64 %{arm} aarch64 ppc64le s390x
++%golang_arches   %{ix86} x86_64 %{arm} aarch64 ppc64le s390x riscv64
+ %gccgo_arches    %{mips}
+ %go_arches       %{golang_arches} %{gccgo_arches}
+ 
+-- 
+1.8.3.1
+

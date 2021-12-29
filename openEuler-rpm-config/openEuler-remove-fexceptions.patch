@@ -1,0 +1,36 @@
+From 783b74a4778101223da41c8d3eb0457a1f9938f2 Mon Sep 17 00:00:00 2001
+From: Yangyang Shen <shenyangyang4@huawei.com>
+Date: Thu, 18 Mar 2021 16:00:27 +0800
+Subject: [PATCH] openEuler remove fexceptions
+
+---
+ macros | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/macros b/macros
+index b06faea..118614d 100644
+--- a/macros
++++ b/macros
+@@ -27,8 +27,8 @@
+ # ---- compiler flags.
+ 
+ %build_cflags %{optflags}
+-%build_cxxflags %{optflags}
+-%build_fflags %{optflags} -I%{_fmoddir}
++%build_cxxflags %{optflags} -fexceptions
++%build_fflags %{optflags} -fexceptions -I%{_fmoddir}
+ %build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags}
+ 
+ %set_build_flags \
+@@ -177,7 +177,7 @@
+ #%_ld_as_needed		1
+ %_ld_as_needed_flags	%{?_ld_as_needed:-Wl,--as-needed}
+ 
+-%__global_compiler_flags	-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} 
++%__global_compiler_flags	-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} 
+ 
+ # Automatically trim changelog entries after 2 years
+ %_changelog_trimtime	%{lua:print(os.time() - 2 * 365 * 86400)}
+-- 
+2.23.0
+

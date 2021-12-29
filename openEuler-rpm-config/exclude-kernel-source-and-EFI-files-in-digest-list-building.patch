@@ -1,0 +1,74 @@
+From 85e9f95d163eb3daa75add855be3208472c51850 Mon Sep 17 00:00:00 2001
+From: Anakin Zhang <benjamin93@163.com>
+Date: Thu, 8 Apr 2021 19:09:00 +0800
+Subject: [PATCH] exclude kernel source and EFI files in digest list building
+
+Signed-off-by: Anakin Zhang <benjamin93@163.com>
+---
+ brp-digest-list | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/brp-digest-list b/brp-digest-list
+index c3b2156..e698b7a 100644
+--- a/brp-digest-list
++++ b/brp-digest-list
+@@ -8,8 +8,6 @@ if [ -z "$RPM_BUILD_ROOT" -o "$RPM_BUILD_ROOT" = "/" ]; then
+ 	exit 0
+ fi
+ 
+-
+-
+ # Create temporary file listing files in the manifest
+ #[ -n "$TMPDIR" ] || TMPDIR="/tmp"
+ TMPDIR="/tmp"
+@@ -34,6 +32,8 @@ mkdir -p $DIGEST_LIST_DIR.sig
+ gen_digest_lists -i M: -t metadata -f compact -d $DIGEST_LIST_DIR -i l:policy \
+ 	-i i: -o add -p -1 -m immutable -i L:$BIN_PKG_FILES -i u: \
+ 	-A $RPM_BUILD_ROOT -i e: \
++	-i E:/usr/src \
++	-i E:/boot/efi \
+ 	-i F:/lib \
+ 	-i F:/usr/lib \
+ 	-i F:/lib64 \
+@@ -43,16 +43,18 @@ gen_digest_lists -i M: -t metadata -f compact -d $DIGEST_LIST_DIR -i l:policy \
+ 	-i F:/lib/firmware \
+ 	-i F:/usr/lib/firmware
+ 
+-f="$DIGEST_LIST_DIR/0-metadata_list-compact-$(basename $BIN_PKG_FILES)"
+-[ -f $f ] || exit 0
++DIGEST_LIST_PATH="$DIGEST_LIST_DIR/0-metadata_list-compact-$(basename $BIN_PKG_FILES)"
++[ -f $DIGEST_LIST_PATH ] || exit 0
+ 
+-chmod 644 $f
+-echo $f
++chmod 644 $DIGEST_LIST_PATH
++echo $DIGEST_LIST_PATH
+ 
+ # Generate TLV digest list to check metadata
+ gen_digest_lists -i M: -t metadata -f compact -d $DIGEST_LIST_DIR.tlv \
+ 	-i l:policy -i i: -o add -p -1 -m immutable -i L:$BIN_PKG_FILES -i u: \
+ 	-T -A $RPM_BUILD_ROOT -i e: \
++	-i E:/usr/src \
++	-i E:/boot/efi \
+ 	-i F:/lib \
+ 	-i F:/usr/lib \
+ 	-i F:/lib64 \
+@@ -62,11 +64,11 @@ gen_digest_lists -i M: -t metadata -f compact -d $DIGEST_LIST_DIR.tlv \
+ 	-i F:/lib/firmware \
+ 	-i F:/usr/lib/firmware
+ 
+-f="$DIGEST_LIST_DIR.tlv/0-metadata_list-compact_tlv-$(basename $BIN_PKG_FILES)"
+-[ -f $f ] || exit 0
++DIGEST_LIST_TLV_PATH="$DIGEST_LIST_DIR.tlv/0-metadata_list-compact_tlv-$(basename $BIN_PKG_FILES)"
++[ -f $DIGEST_LIST_TLV_PATH ] || exit 0
+ 
+-chmod 644 $f
+-echo $f
++chmod 644 $DIGEST_LIST_TLV_PATH
++echo $DIGEST_LIST_TLV_PATH
+ 
+ if [[ "$(basename $BIN_PKG_FILES)" =~ "digest-list-tools" && \
+       ! $(basename $BIN_PKG_FILES) =~ "debug" ]]; then
+-- 
+1.8.3.1
+

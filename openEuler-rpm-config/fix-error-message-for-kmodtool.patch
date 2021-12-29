@@ -1,0 +1,25 @@
+From 177688aa4c6888a693da0ee7a06e01066cde4c54 Mon Sep 17 00:00:00 2001
+From: Yangyang Shen <shenyangyang4@huawei.com>
+Date: Wed, 30 Sep 2020 14:45:14 +0800
+Subject: [PATCH] fix error message for kmodtool
+
+---
+ kmodtool.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kmodtool.py b/kmodtool.py
+index 724f481..75492b9 100644
+--- a/kmodtool.py
++++ b/kmodtool.py
+@@ -39,7 +39,7 @@ def get_rpmtemplate(kmod_name,verrel):
+     print("This package provides the " + kmod_name + " kernel modules built for the Linux")
+     print("kernel "+ verrel + " for the %{_target_cpu} family of processors.")
+     print("%post          -n kmod-" + kmod_name)
+-    print("if [ -e /boot/System.map-" + verrel + "]; then")
++    print("if [ -e /boot/System.map-" + verrel + " ]; then")
+     print("   /sbin/depmod -aeF /boot/System.map-" + verrel +" " + verrel +"> /dev/null || :")
+     print("fi")
+     if (kmp !=""):
+-- 
+2.23.0
+

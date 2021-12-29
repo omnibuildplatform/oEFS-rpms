@@ -1,0 +1,4 @@
+version_control: gitee
+src_repo: https://gitee.com/openeuler/openEuler-rpm-config
+tag_prefix: "^"
+seperator: "."

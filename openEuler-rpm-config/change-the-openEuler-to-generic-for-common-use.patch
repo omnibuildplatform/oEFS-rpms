@@ -1,0 +1,87 @@
+From e9f486a8d9af5b01dcadf8432a449e434cd6886b Mon Sep 17 00:00:00 2001
+From: Yangyang Shen <shenyangyang4@huawei.com>
+Date: Sat, 27 Mar 2021 14:18:56 +0800
+Subject: [PATCH] change the openEuler to generic for common use
+
+---
+ openEuler-hardened-cc1 => generic-hardened-cc1 |  0
+ openEuler-hardened-ld => generic-hardened-ld   |  0
+ openEuler-pie-cc1 => generic-pie-cc1           |  0
+ openEuler-pie-ld => generic-pie-ld             |  0
+ macros                                         | 14 +++++++-------
+ 5 files changed, 7 insertions(+), 7 deletions(-)
+ rename openEuler-hardened-cc1 => generic-hardened-cc1 (100%)
+ rename openEuler-hardened-ld => generic-hardened-ld (100%)
+ rename openEuler-pie-cc1 => generic-pie-cc1 (100%)
+ rename openEuler-pie-ld => generic-pie-ld (100%)
+
+diff --git a/openEuler-hardened-cc1 b/generic-hardened-cc1
+similarity index 100%
+rename from openEuler-hardened-cc1
+rename to generic-hardened-cc1
+diff --git a/openEuler-hardened-ld b/generic-hardened-ld
+similarity index 100%
+rename from openEuler-hardened-ld
+rename to generic-hardened-ld
+diff --git a/openEuler-pie-cc1 b/generic-pie-cc1
+similarity index 100%
+rename from openEuler-pie-cc1
+rename to generic-pie-cc1
+diff --git a/openEuler-pie-ld b/generic-pie-ld
+similarity index 100%
+rename from openEuler-pie-ld
+rename to generic-pie-ld
+diff --git a/macros b/macros
+index b06faea..ce7cf5c 100644
+--- a/macros
++++ b/macros
+@@ -52,7 +52,7 @@
+ %configure \
+   %{set_build_flags}; \
+   [ "%_configure_gnuconfig_hack" = 1 ] && for i in $(find $(dirname %{_configure}) -name config.guess -o -name config.sub) ; do \
+-      [ -f /usr/lib/rpm/openEuler/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/openEuler/$(basename $i) $i ; \
++      [ -f /usr/lib/rpm/%{_vendor}/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/%{_vendor}/$(basename $i) $i ; \
+   done ; \
+   [ "%_configure_libtool_hardening_hack" = 1 ] && [ x != "x%{_hardened_ldflags}" ] && \
+       for i in $(find . -name ltmain.sh) ; do \
+@@ -89,7 +89,7 @@
+ 
+ # Build root policy macros. Standard naming:
+ # convert all '-' in basename to '_', add two leading underscores.
+-%__brp_ldconfig /usr/lib/rpm/openEuler/brp-ldconfig
++%__brp_ldconfig /usr/lib/rpm/brp-ldconfig
+ %__brp_compress /usr/lib/rpm/brp-compress
+ %__brp_strip /usr/lib/rpm/brp-strip %{__strip}
+ %__brp_strip_comment_note /usr/lib/rpm/brp-strip-comment-note %{__strip} %{__objdump}
+@@ -144,8 +144,8 @@
+ # secure options for rpmbuild
+ #
+ # #hardened options
+-%_hardening_cflags	-specs=/usr/lib/rpm/%{_vendor}/openEuler-hardened-cc1
+-%_hardening_ldflags	-Wl,-z,now -specs=/usr/lib/rpm/%{_vendor}/openEuler-hardened-ld
++%_hardening_cflags	-specs=/usr/lib/rpm/generic-hardened-cc1
++%_hardening_ldflags	-Wl,-z,now -specs=/usr/lib/rpm/generic-hardened-ld
+ # Use "%undefine _hardened_build" to disable.
+ %_hardened_build	1
+ %_hardened_cflags	%{?_hardened_build:%{_hardening_cflags}}
+@@ -156,14 +156,14 @@
+ #Use "%undefine _sec_opt_build" to disable.
+ #Use "%undefine _pie_build" to disable.
+ %_pie_build     1
+-%_pie_pre_cflags   -specs=/usr/lib/rpm/%{_vendor}/openEuler-pie-cc1
+-%_pie_pre_ldflags  -Wl,-z,now -specs=/usr/lib/rpm/%{_vendor}/openEuler-pie-ld
++%_pie_pre_cflags   -specs=/usr/lib/rpm/generic-pie-cc1
++%_pie_pre_ldflags  -Wl,-z,now -specs=/usr/lib/rpm/generic-pie-ld
+ %_pie_cflags       %{?_sec_opt_build:?_pie_build:%{_pie_pre_cflags}}
+ %_pie_ldflags      %{?_sec_opt_build:?_pie_build:%{_pie_pre_ldflags}}
+ 
+ #Use "%undefine _fs_build" to disable.
+ %_fs_build      1
+-%_fs_pre_cflags    -specs=/usr/lib/rpm/%{_vendor}/openEuler-fs-cc1
++%_fs_pre_cflags    -specs=/usr/lib/rpm/generic-fs-cc1
+ %_fs_cflags        %{?_fs_build:%{_fs_pre_cflags}}
+ 
+ 
+-- 
+2.23.0
+

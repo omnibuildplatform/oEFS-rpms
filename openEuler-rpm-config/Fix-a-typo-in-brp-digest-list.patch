@@ -1,0 +1,26 @@
+From a82057c590f958d10898c2e5f7211241be3dfd7a Mon Sep 17 00:00:00 2001
+From: Roberto Sassu <roberto.sassu@huawei.com>
+Date: Fri, 26 Feb 2021 09:00:06 +0100
+Subject: [PATCH] Fix a typo in brp-digest-list
+
+Rename RPM_PACKAGE_NAM to RPM_PACKAGE_NAME.
+---
+ brp-digest-list | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/brp-digest-list b/brp-digest-list
+index 435b962..c3b2156 100644
+--- a/brp-digest-list
++++ b/brp-digest-list
+@@ -86,7 +86,7 @@ if [[ "$(basename $BIN_PKG_FILES)" =~ "digest-list-tools" && \
+ 
+ 	export BRP_PESIGN_FILES="$2/etc/ima/digest_lists/*"
+ 	export RPM_BUILD_ROOT
+-	export RPM_PACKAGE_NAM="digest-list-tools"
++	export RPM_PACKAGE_NAME="digest-list-tools"
+ 	export RPM_SOURCE_DIR="$(rpm --eval %_topdir)/SOURCES"
+ 
+ 	if [ -f "/usr/lib/rpm/brp-suse.d/brp-99-pesign" ]; then
+-- 
+2.26.2
+
